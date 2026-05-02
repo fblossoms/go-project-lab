@@ -17,6 +17,11 @@ type AddCommentRequest struct {
 
 func (c *CommentController) AddComment(ctx context.Context, in AddCommentRequest) (*models.Comment, error) {
 	book, err := Book.GetBook(ctx, NewGetBookRequest(in.BookNumber))
+
+	// 异常断言
+	//if exception.IsApiException(err, exception.CODE_NOT_FOUND) {
+	//
+	//}
 	if err != nil {
 		// 获取的Book是否存在（获取时是否报错）
 		return nil, err

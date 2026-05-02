@@ -3,7 +3,10 @@ package controllers
 import (
 	"context"
 	"go18/book/v3/config"
+	"go18/book/v3/exception"
 	"go18/book/v3/models"
+
+	"gorm.io/gorm"
 )
 
 var Book = &BookController{}
@@ -35,9 +38,11 @@ func (c *BookController) GetBook(ctx context.Context, in *GetBookRequest) (*mode
 
 	err := config.DB().Where("id = ?", in.BookNumber).Take(bookInstance).Error
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, exception.ErrNotFound("book %s not found", in.BookNumber)
+		}
 		return nil, err
 	}
-
 	return bookInstance, nil
 }
 
