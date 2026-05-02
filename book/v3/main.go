@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"go18/book/v3/config"
+	"go18/book/v3/exception"
 	"go18/book/v3/handlers"
 	"os"
 
@@ -10,7 +11,14 @@ import (
 )
 
 func main() {
-	server := gin.Default()
+	path := os.Getenv("CONFIG_PATH")
+	if path == "" {
+		path = "application.yaml"
+	}
+	config.LoadConfigFromYaml(path)
+
+	server := gin.New()
+	server.Use(gin.Logger(), exception.Recovery())
 
 	handlers.Book.Registry(server)
 

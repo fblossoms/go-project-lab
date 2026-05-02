@@ -99,6 +99,9 @@ func (h *BookApiHandler) CreateBook(ctx *gin.Context) {
 }
 
 func (h *BookApiHandler) GetBook(ctx *gin.Context) {
+	// 测试gin.Recovery
+	// panic("test")
+
 	book, err := controllers.Book.GetBook(ctx, controllers.NewGetBookRequest(ctx.Param("bn")))
 	if err != nil {
 		response.Failed(ctx, err)
