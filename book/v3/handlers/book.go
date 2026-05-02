@@ -84,7 +84,13 @@ func (h *BookApiHandler) CreateBook(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, bookInstance)
+	book, err := controllers.Book.CreateBook(ctx.Request.Context(), bookSpecInstance)
+	if err != nil {
+		ctx.JSON(400, gin.H{"code": 400, "message": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, book)
 }
 
 func (h *BookApiHandler) GetBook(ctx *gin.Context) {

@@ -40,3 +40,13 @@ func (c *BookController) GetBook(ctx context.Context, in *GetBookRequest) (*mode
 
 	return bookInstance, nil
 }
+
+func (c *BookController) CreateBook(ctx context.Context, in *models.BookSpec) (*models.Book, error) {
+	bookInstance := &models.Book{BookSpec: *in}
+
+	err := config.DB().Save(bookInstance).Error
+	if err != nil {
+		return nil, err
+	}
+	return bookInstance, nil
+}

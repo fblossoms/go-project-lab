@@ -73,8 +73,8 @@ func (m *mySQL) GetDB() *gorm.DB {
 	m.lock.Lock()
 	defer m.lock.Unlock()
 
-	if m.DB == "" {
-		dsn := fmt.Sprintf("%s:%s@tcp(%s?parseTime=true&loc=Local",
+	if m.db == nil {
+		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true&loc=Local",
 			m.Username,
 			m.Password,
 			m.Host,
@@ -88,6 +88,7 @@ func (m *mySQL) GetDB() *gorm.DB {
 		}
 		db.AutoMigrate(&models.Book{})
 		m.db = db
+		L().Info().Msgf("Database: %s", m.DB)
 	}
 
 	return m.db
