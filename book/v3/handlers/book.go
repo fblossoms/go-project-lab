@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"go18/book/v3/config"
+	"go18/book/v3/controllers"
 	"go18/book/v3/models"
 	"net/http"
 	"strconv"
@@ -13,6 +14,7 @@ var Book = &BookApiHandler{}
 
 type BookApiHandler struct{}
 
+// Registry 重构handler
 func (h *BookApiHandler) Registry(server gin.IRouter) {
 	server.GET("/api/books", Book.ListBook)
 
@@ -86,15 +88,13 @@ func (h *BookApiHandler) CreateBook(ctx *gin.Context) {
 }
 
 func (h *BookApiHandler) GetBook(ctx *gin.Context) {
-	bookInstance := &models.Book{}
-
-	err := config.DB().Where("id = ?", ctx.Param("bn")).Take(bookInstance).Error
+	book, err := controllers.Book.GetBook(ctx, controllers.NewGetBookRequest(ctx.Param("bn")))
 	if err != nil {
-		ctx.JSON(400, gin.H{"code": 400, "message": err.Error()})
+		ctx.JSON(500, gin.H{"code": 500, "message": err})
 		return
 	}
 
-	ctx.JSON(200, bookInstance)
+	ctx.JSON(200, book)
 }
 
 func (h *BookApiHandler) UpdateBook(ctx *gin.Context) {

@@ -3,9 +3,13 @@ package config
 import (
 	"fmt"
 	"go18/book/v3/models"
+	"io"
+	"strings"
 	"sync"
+	"time"
 
 	"github.com/infraboard/mcube/v2/tools/pretty"
+	"github.com/rs/zerolog"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -24,6 +28,9 @@ func Default() *Config {
 			Password: "",
 			Debug:    true,
 		},
+		Log: &Log{
+			Level: zerolog.DebugLevel,
+		},
 	}
 }
 
@@ -34,6 +41,7 @@ func Default() *Config {
 type Config struct {
 	Application *application `toml:"app" yaml:"app" json:"app"`
 	MySQL       *mySQL       `toml:"mysql" yaml:"mysql" json:"mysql"`
+	Log         *Log         `toml:"log" yaml:"log" json:"log"`
 }
 
 func (c *Config) String() string {
@@ -83,4 +91,47 @@ func (m *mySQL) GetDB() *gorm.DB {
 	}
 
 	return m.db
+}
+
+type Log struct {
+	Level zerolog.Level `json:"level" yaml:"level" toml:"level" env:"LOG_LEVEL"`
+
+	logger *zerolog.Logger
+	lock   sync.Mutex
+}
+
+func (l *Log) SetLogger(logger zerolog.Logger) {
+	l.logger = &logger
+}
+
+func (l *Log) Logger() *zerolog.Logger {
+	l.lock.Lock()
+	defer l.lock.Unlock()
+
+	if l.logger == nil {
+		l.SetLogger(zerolog.New(l.ConsoleWriter()).Level(l.Level).With().Caller().Timestamp().Logger())
+	}
+
+	return l.logger
+}
+
+func (c *Log) ConsoleWriter() io.Writer {
+	output := zerolog.NewConsoleWriter(func(w *zerolog.ConsoleWriter) {
+		w.NoColor = false
+		w.TimeFormat = time.RFC3339
+	})
+
+	output.FormatLevel = func(i interface{}) string {
+		return strings.ToUpper(fmt.Sprintf("%-6s", i))
+	}
+	output.FormatMessage = func(i interface{}) string {
+		return fmt.Sprintf("%s", i)
+	}
+	output.FormatFieldName = func(i interface{}) string {
+		return fmt.Sprintf("%s", i)
+	}
+	output.FormatFieldValue = func(i interface{}) string {
+		return fmt.Sprintf("%s", i)
+	}
+	return output
 }

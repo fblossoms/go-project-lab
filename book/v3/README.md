@@ -14,3 +14,5 @@ v2中独立出了config包和main包，main包依赖config包的配置（配置�
   - 如果是API服务，视图层放到就是Json格式的字符串（主流）
 - controller控制（器）层（数据的处理）
   - 把数据处理独立出来，利于相互引用
+
+![v2_architecture_diagram.png](v3_architecture_diagram.png)
