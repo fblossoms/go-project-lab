@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"go18/book/v3/config"
 	"go18/book/v3/handlers"
 	"os"
 
@@ -13,7 +14,9 @@ func main() {
 
 	handlers.Book.Registry(server)
 
-	err := server.Run(":8080")
+	ac := config.C().Application
+
+	err := server.Run(fmt.Sprintf("%s:%d", ac.Host, ac.Port))
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

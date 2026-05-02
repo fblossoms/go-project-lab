@@ -59,11 +59,13 @@ type mySQL struct {
 	lock sync.Mutex
 }
 
+// GetDB 抽象出对象，全局共享
+// 基本原则：所有对对象的数据主要来源于哪个数据结构，就把他变成哪个数据结构的方法
 func (m *mySQL) GetDB() *gorm.DB {
 	m.lock.Lock()
 	defer m.lock.Unlock()
 
-	if m.DB == nil {
+	if m.DB == "" {
 		dsn := fmt.Sprintf("%s:%s@tcp(%s?parseTime=true&loc=Local",
 			m.Username,
 			m.Password,
