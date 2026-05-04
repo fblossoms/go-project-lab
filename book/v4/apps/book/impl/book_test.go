@@ -17,3 +17,12 @@ func TestCreateBook(t *testing.T) {
 	}
 	t.Log(ins)
 }
+
+func TestQueryBook(t *testing.T) {
+	req := book.NewQueryBookeRequest()
+	ins, err := svc.QueryBook(ctx, req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(ins)
+}

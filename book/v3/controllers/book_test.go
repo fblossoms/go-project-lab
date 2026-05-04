@@ -31,7 +31,7 @@ func TestCreateBook(t *testing.T) {
 
 func init() {
 	// 执行配置的加载
-	err := config.LoadConfigFromYaml("C:/Users/flyfl/Desktop/go_18/book/v3/application.yaml")
+	err := config.LoadConfigFromYaml("C:/Users/flyfl/Desktop/go_18/book/v3/application.toml")
 	if err != nil {
 		panic(err)
 	}

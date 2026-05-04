@@ -22,7 +22,7 @@ config.C().MySQL.Host
 如何验证我们这个包的业务逻辑是否正确
 ```go
 func TestLoadConfigFromYaml(t *testing.T) {
-	err := config.LoadConfigFromYaml(fmt.Sprintf("%sC:\\Users\\flyfl\\Desktop\\go_18\\book\\v2\\application.yaml", os.Getenv("workspaceFolder")))
+	err := config.LoadConfigFromYaml(fmt.Sprintf("%sC:\\Users\\flyfl\\Desktop\\go_18\\book\\v2\\application.toml", os.Getenv("workspaceFolder")))
 	if err != nil {
 		t.Fatal(err)
 	}

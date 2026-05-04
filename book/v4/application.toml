@@ -1,0 +1,9 @@
+[datasource]
+    provider = "mysql"           # 数据库驱动，默认 mysql
+    host     = "127.0.0.1"
+    port     = 3306
+    database = "go18"
+    username = "root"
+    password = ""
+    debug    = false             # 打印所有 SQL
+    trace    = true              # 启用 OpenTelemetry 链路追踪

@@ -4,8 +4,19 @@ import (
 	"context"
 
 	"github.com/infraboard/mcube/v2/http/request"
+	"github.com/infraboard/mcube/v2/ioc"
+	"github.com/infraboard/mcube/v2/ioc/config/validator"
 	"github.com/infraboard/mcube/v2/types"
 )
+
+// APP_NAME 当前以服务名称作为实现名称
+const (
+	APP_NAME = "book"
+)
+
+func GetService() Service {
+	return ioc.Controller().Get(APP_NAME).(Service) // 取出来并断言成接口
+}
 
 // Service Book的业务定义
 type Service interface {
@@ -37,6 +48,13 @@ type CreateBookRequest struct {
 	Author string  `json:"author" gorm:"column:author;type:varchar(200);index" validate:"required"`
 	Price  float64 `json:"price" gorm:"column:price" validate:"required"`
 	IsSale bool    `json:"is_sale" gorm:"column:is_sale"`
+}
+
+// Validate 请求对象的参数校验
+func (r *CreateBookRequest) Validate() error {
+	// validate := validator.New()
+	// validate.Struct(r)
+	return validator.Validate(r)
 }
 
 func NewQueryBookeRequest() *QueryBookRequest {

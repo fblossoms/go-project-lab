@@ -54,7 +54,7 @@ func TestAdd(t *testing.T) {
 ```json
 {
     "go.testEnvVars": {
-        "CONFIG_PATH": "application.yaml"
+        "CONFIG_PATH": "application.toml"
     }
 }
 ```

@@ -13,7 +13,7 @@ import (
 func main() {
 	path := os.Getenv("CONFIG_PATH")
 	if path == "" {
-		path = "application.yaml"
+		path = "application.toml"
 	}
 	config.LoadConfigFromYaml(path)
 
