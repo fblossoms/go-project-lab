@@ -1,3 +1,9 @@
+[app]
+    name = "simple_api"
+    description = "app desc"
+    address = "localhost"
+    encrypt_key = "defualt app encrypt key"
+
 [datasource]
     provider = "mysql"           # 数据库驱动，默认 mysql
     host     = "127.0.0.1"
@@ -7,3 +13,8 @@
     password = ""
     debug    = false             # 打印所有 SQL
     trace    = true              # 启用 OpenTelemetry 链路追踪
+
+[http]
+    host = "127.0.0.1"
+    port = 8010
+    path_prefix = "api"

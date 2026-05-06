@@ -1,8 +1,26 @@
 package main
 
-import "github.com/infraboard/mcube/v2/ioc"
+import (
+	"context"
+	_ "go18/book/v4/apps/api"
+	_ "go18/book/v4/apps/book/impl"
+
+	"github.com/infraboard/mcube/v2/ioc"
+	"github.com/infraboard/mcube/v2/ioc/server"
+)
 
 func main() {
 	// ioc框架：加载对象，配置对象，注入对象
-	ioc.DevelopmentSetupWithPath("")
+	//ioc.DevelopmentSetupWithPath("")
+
+	//server.Gin.Run()
+	//application.Get().AppName
+	//http.Get().Host
+	ioc.DevelopmentSetupWithPath("book/v4/application.toml")
+	server.Run(context.Background())
+
+	// ioc直接提供server，直接run
+	// mcube包含一个gin. engine
+	//server.Run(context.Background())
+	//cmd.Start()
 }
