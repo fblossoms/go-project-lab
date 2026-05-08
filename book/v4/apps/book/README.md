@@ -277,3 +277,30 @@ func main() {
 	// 非业务模块
 	_ "github.com/infraboard/mcube/v2/ioc/apps/metric/gin"
 ```
+
+[metric.v1 books.v1 health.v1] metric, health 使用注入的对象
+```sh
+(base) PS C:\Users\flyfl\Desktop\go_18\book\v4> go run main.go -f C:\Users\flyfl\Desktop\go_18\book\v4\application.toml
+2026-05-08T11:40:50+08:00 WARN   config/vault/vault.go:113 > vault address is empty, skipping initialization app:simple_api group:default hostname:Fblossoms logger:vault
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:   export GIN_MODE=release
+ - using code:  gin.SetMode(gin.ReleaseMode)
+
+2026-05-08T11:40:50+08:00 INFO   config/gin/framework.go:41 > enable gin recovery app:simple_api group:default hostname:Fblossoms logger:gin_webframework
+2026-05-08T11:40:50+08:00 WARN   config/datasource/grom.go:285 > password is empty for static credential mode app:simple_api group:default hostname:Fblossoms logger:datasource
+2026-05-08T11:40:50+08:00 INFO   config/datasource/grom.go:287 > using static credentials from config file app:simple_api group:default hostname:Fblossoms logger:datasource
+[GIN-debug] GET    /metrics/                 --> github.com/infraboard/mcube/v2/ioc/apps/metric/gin.(*ginHandler).Registry.func1 (5 handlers)
+2026-05-08T11:40:50+08:00 INFO   metric/gin/metric.go:89 > Get the Metric using http://127.0.0.1:8010/metrics app:simple_api group:default hostname:Fblossoms logger:metric
+[GIN-debug] GET    /healthz/                 --> github.com/infraboard/mcube/v2/ioc/apps/health/gin.(*HealthChecker).HealthHandleFunc-fm (5 handlers)
+2026-05-08T11:40:50+08:00 INFO   health/gin/check.go:55 > Get the Health using http://127.0.0.1:8010/healthz app:simple_api group:default hostname:Fblossoms logger:health_check
+[GIN-debug] GET    /api/simple_api/1.0.0/books --> go18/book/v4/apps/book/api.(*BookApiHandler).queryBook-fm (5 handlers)
+[GIN-debug] POST   /api/simple_api/1.0.0/books --> go18/book/v4/apps/book/api.(*BookApiHandler).createBook-fm (5 handlers)
+2026-05-08T11:40:50+08:00 INFO   config/jsonrpc/service.go:114 > no reigstry service app:simple_api group:default hostname:Fblossoms logger:jsonrpc
+2026-05-08T11:40:50+08:00 INFO   ioc/server/server.go:79 > loaded configs: [app.1.0.0 trace.1.0.0 log.1.0.0 vault.1.0.0 validator.1.0.0 gin_webframework.1.0.0 datasource.1.0.0 grpc.1.0.0 http.1.0.0] app:simple_api group:default hostname:Fblossoms logger:server
+2026-05-08T11:40:50+08:00 INFO   ioc/server/server.go:79 > loaded default: [] app:simple_api group:default hostname:Fblossoms logger:server
+2026-05-08T11:40:50+08:00 INFO   ioc/server/server.go:79 > loaded controllers: [book.1.0.0] app:simple_api group:default hostname:Fblossoms logger:server
+2026-05-08T11:40:50+08:00 INFO   ioc/server/server.go:79 > loaded apis: [metric.v1 health.1.0.0 books.1.0.0 jsonrpc.1.0.0] app:simple_api group:default hostname:Fblossoms logger:server
+2026-05-08T11:40:50+08:00 INFO   config/http/http.go:145 > HTTP服务启动成功, 监听地址: 127.0.0.1:8010 app:simple_api group:default hostname:Fblossoms logger:http
+```

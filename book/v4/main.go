@@ -22,7 +22,7 @@ func main() {
 	//server.Gin.Run()
 	//application.Get().AppName
 	//http.Get().Host
-	ioc.DevelopmentSetupWithPath("book/v4/application.toml")
+	ioc.DevelopmentSetupWithPath("C:/Users/flyfl/Desktop/go_18/book/v4/application.toml")
 	server.Run(context.Background())
 
 	// ioc直接提供server，直接run
