@@ -143,6 +143,137 @@ book.GetService().DescribeBook(ctx)
 
 接口是需求，对业务进行设计，可以选择把这些能力以哪种接口的形式对外提供服务
 
-1. 不对外提供接口，仅作为其他业务的依赖
-2. （API）对外提供HTTP接口，RESTful接口
-3. （API）对内提供接口（JSON RPC/gRPC）
+   1. 不对外提供接口，仅作为其他业务的依赖
+   2. （API）对外提供HTTP接口，RESTful接口
+   3. （API）对内提供接口（JSON RPC/gRPC）
+
+1. 开发业务功能
+```go
+func (h *BookApiHandler) createBook(ctx *gin.Context) {
+req := book.NewCreateBookRequest()
+
+err := ctx.BindJSON(req)
+if err != nil {
+response.Failed(ctx, err)
+return
+}
+
+ins, err := h.svc.CreateBook(ctx.Request.Context(), req)
+if err != nil {
+response.Failed(ctx, err)
+return
+}
+
+response.Success(ctx, ins)
+}
+
+```
+
+2. 注册路由
+```go
+type BookApiHandler struct {
+	ioc.ObjectImpl
+
+	svc book.Service
+}
+
+// Name 就是 API 的资源名称
+// api/book/v1/books
+func (h *BookApiHandler) Name() string {
+	return "books"
+}
+
+// Init 就是对象的初始化
+// 主要初始化对象的属性
+// 构造函数
+func (h *BookApiHandler) Init() error {
+	h.svc = book.GetService()
+
+	// 本地依赖
+	//r := server.Gin
+
+	// 框架托管，通过容器获取Server对象
+	// 获取的Gin Engine对象
+	// RootRouter() 可能存在URL容器冲突的问题
+	// ObjectRouter() 可以自动加上业务板块前缀或者对象名称避免冲突，格式为/<prefix>/<service_name>/<object_version>/<object_name>
+	r := ioc_gin.ObjectRouter(h)
+	r.GET("", h.queryBook)
+
+	r.POST("", h.createBook)
+
+	return nil
+}
+
+func init() {
+	ioc.Api().Registry(&BookApiHandler{})
+}
+```
+
+## 业务注册
+
+每写完一个业务，就需要注册到注册表ioc（注册表）
+```go
+
+import (
+	// api impl
+	_ "go18/book/v4/apps/book/api"
+
+	// service impl
+	_ "go18/book/v4/apps/book/impl"
+	_ "go18/book/v4/apps/comment/impl"
+)
+```
+
+## 启动服务
+```go
+func main() {
+	// ioc框架：加载对象，配置对象，注入对象
+	//ioc.DevelopmentSetupWithPath("")
+
+	//server.Gin.Run()
+	//application.Get().AppName
+	//http.Get().Host
+	ioc.DevelopmentSetupWithPath("book/v4/application.toml")
+	server.Run(context.Background())
+
+	// ioc直接提供server，直接run
+	// mcube包含一个gin. engine
+	//server.Run(context.Background())
+	//cmd.Start()
+}
+```
+
+```sh
+2026-05-08T11:21:58+08:00 WARN   config/vault/vault.go:113 > vault address is empty, skipping initialization app:simple_api group:default hostname:Fblossoms logger:vault
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+2026-05-08T11:21:58+08:00 INFO   config/gin/framework.go:41 > enable gin recovery app:simple_api group:default hostname:Fblossoms logger:gin_webframework
+2026-05-08T11:21:58+08:00 WARN   config/datasource/grom.go:285 > password is empty for static credential mode app:simple_api group:default hostname:Fblossoms logger:datasource
+2026-05-08T11:21:58+08:00 INFO   config/datasource/grom.go:287 > using static credentials from config file app:simple_api group:default hostname:Fblossoms logger:datasource
+[GIN-debug] GET    /api/simple_api/1.0.0/books --> go18/book/v4/apps/book/api.(*BookApiHandler).queryBook-fm (4 handlers)
+[GIN-debug] POST   /api/simple_api/1.0.0/books --> go18/book/v4/apps/book/api.(*BookApiHandler).createBook-fm (4 handlers)
+2026-05-08T11:21:58+08:00 INFO   config/jsonrpc/service.go:114 > no reigstry service app:simple_api group:default hostname:Fblossoms logger:jsonrpc
+2026-05-08T11:21:58+08:00 INFO   ioc/server/server.go:79 > loaded configs: [app.1.0.0 trace.1.0.0 log.1.0.0 vault.1.0.0 validator.1.0.0 gin_webframework.1.0.0 datasource.1.0.0 grpc.1.0.0 http.1.0.0] app:simple_api group:default hostname:Fblossoms logger:server
+2026-05-08T11:21:58+08:00 INFO   ioc/server/server.go:79 > loaded default: [] app:simple_api group:default hostname:Fblossoms logger:server
+2026-05-08T11:21:58+08:00 INFO   ioc/server/server.go:79 > loaded controllers: [book.1.0.0] app:simple_api group:default hostname:Fblossoms logger:server
+2026-05-08T11:21:58+08:00 INFO   ioc/server/server.go:79 > loaded apis: [books.1.0.0 jsonrpc.1.0.0] app:simple_api group:default hostname:Fblossoms logger:server
+2026-05-08T11:21:58+08:00 INFO   config/http/http.go:145 > HTTP服务启动成功, 监听地址: 127.0.0.1:8010 app:simple_api group:default hostname:Fblossoms logger:http
+```
+
+## 总结
+
+业务分区框架，我们专注于业务对象的开发，mcube相当于一个工具箱，承接其他非业务的公共功能
+
+## 其他非功能需求，开箱即用，比如健康检查health check，比如metrics
+
+```go
+	// 健康检查
+	_ "github.com/infraboard/mcube/v2/ioc/apps/health/gin"
+
+	// 非业务模块
+	_ "github.com/infraboard/mcube/v2/ioc/apps/metric/gin"
+```
